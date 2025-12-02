@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"testing"
 
 	"github.com/allanCordeiro/talent-db/application/domain"
@@ -16,18 +17,18 @@ func NewInMemoryTalentGateway() *InMemoryTalentGateway {
 	}
 }
 
-func (g *InMemoryTalentGateway) Save(talent domain.Talent) error {
+func (g *InMemoryTalentGateway) Save(ctx context.Context, talent domain.Talent) error {
 	g.talents[talent.Id.String()] = talent
 	return nil
 }
-func (g *InMemoryTalentGateway) GetTalents() ([]domain.Talent, error) {
+func (g *InMemoryTalentGateway) GetTalents(ctx context.Context) ([]domain.Talent, error) {
 	var talents []domain.Talent
 	for _, t := range g.talents {
 		talents = append(talents, t)
 	}
 	return talents, nil
 }
-func (g *InMemoryTalentGateway) GetTalentById(id string) (*domain.Talent, error) {
+func (g *InMemoryTalentGateway) GetTalentById(ctx context.Context, id string) (*domain.Talent, error) {
 	if talent, exists := g.talents[id]; exists {
 		return &talent, nil
 	}
@@ -35,8 +36,9 @@ func (g *InMemoryTalentGateway) GetTalentById(id string) (*domain.Talent, error)
 }
 
 func TestCreateTalentSuccess(t *testing.T) {
+	ctx := context.Background()
 	gateway := NewInMemoryTalentGateway()
-	useCase := NewCreateTalentUseCase(gateway)
+	useCase := NewCreateTalentUseCase(ctx, gateway)
 
 	input := CreateTalentInputDTO{
 		ProfileURL:     "https://linkedin.com/in/test",
@@ -64,8 +66,9 @@ func TestCreateTalentSuccess(t *testing.T) {
 }
 
 func TestCreateTalentSavedData(t *testing.T) {
+	ctx := context.Background()
 	gateway := NewInMemoryTalentGateway()
-	useCase := NewCreateTalentUseCase(gateway)
+	useCase := NewCreateTalentUseCase(ctx, gateway)
 
 	input := CreateTalentInputDTO{
 		FullName:       "Jane Smith",

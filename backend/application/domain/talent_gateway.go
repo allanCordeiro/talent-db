@@ -1,7 +1,9 @@
 package domain
 
+import "context"
+
 type TalentGateway interface {
-	Save(Talent) error
-	GetTalents() ([]Talent, error)
-	GetTalentById(id string) (*Talent, error)
+	Save(ctx context.Context, talent Talent) error
+	GetTalents(ctx context.Context) ([]Talent, error)
+	GetTalentById(ctx context.Context, id string) (*Talent, error)
 }

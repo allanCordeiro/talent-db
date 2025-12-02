@@ -1,13 +1,19 @@
 package usecase
 
-import "github.com/allanCordeiro/talent-db/application/domain"
+import (
+	"context"
+
+	"github.com/allanCordeiro/talent-db/application/domain"
+)
 
 type CreateTalentUseCase struct {
 	TalentGateway domain.TalentGateway
+	Ctx           context.Context
 }
 
-func NewCreateTalentUseCase(talentGateway domain.TalentGateway) *CreateTalentUseCase {
+func NewCreateTalentUseCase(ctx context.Context, talentGateway domain.TalentGateway) *CreateTalentUseCase {
 	return &CreateTalentUseCase{
+		Ctx:           ctx,
 		TalentGateway: talentGateway,
 	}
 }
@@ -42,7 +48,7 @@ func (uc *CreateTalentUseCase) Execute(input CreateTalentInputDTO) (*CreateTalen
 		return nil, err
 	}
 
-	err = uc.TalentGateway.Save(*talent)
+	err = uc.TalentGateway.Save(uc.Ctx, *talent)
 	if err != nil {
 		return nil, err
 	}
