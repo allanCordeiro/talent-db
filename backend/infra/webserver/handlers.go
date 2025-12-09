@@ -58,3 +58,25 @@ func (h *Handler) CreateTalent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 }
+
+func (h *Handler) GetTalent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	input := usecase.GetTalentInputDTO{
+		Id: r.PathValue("id"),
+	}
+	uc := usecase.NewGetTalentUseCase(r.Context(), h.TalentGateway)
+	output, err := uc.Execute(input)
+	if err != nil {
+		if err.Error() == "talent not found" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("application error: " + err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(output)
+
+}

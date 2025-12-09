@@ -58,19 +58,3 @@ func (t *Talent) Validate() error {
 	}
 	return nil
 }
-
-func BuildTalent(id uuid.UUID, profileUrl string, possibleRole string, fullName string, headline string, currentCompany string,
-	currentRole string, tags []string, notes string, capturedAt time.Time) *Talent {
-	return &Talent{
-		Id:             id,
-		ProfileURL:     profileUrl,
-		PossibleRole:   possibleRole,
-		FullName:       fullName,
-		Headline:       headline,
-		CurrentCompany: currentCompany,
-		CurrentRole:    currentRole,
-		Tags:           tags,
-		Notes:          notes,
-		CapturedAt:     capturedAt,
-	}
-}

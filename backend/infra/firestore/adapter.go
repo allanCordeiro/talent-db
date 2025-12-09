@@ -2,9 +2,11 @@ package firestore
 
 import (
 	"context"
+	"errors"
 
 	"cloud.google.com/go/firestore"
 	"github.com/allanCordeiro/talent-db/application/domain"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -59,11 +61,19 @@ func (db *TalentDB) GetTalents(ctx context.Context) ([]domain.Talent, error) {
 
 func (db *TalentDB) GetTalentById(ctx context.Context, id string) (*domain.Talent, error) {
 	doc, err := db.fsClient.Collection("talents").Doc(id).Get(ctx)
-	if err != nil {
+	if status.Code(err) == codes.NotFound {
+		return nil, errors.New("talent not found")
+	}
+	if err != nil && status.Code(err) != codes.NotFound {
 		return nil, err
 	}
 	var talent domain.Talent
 	err = doc.DataTo(&talent)
+	if err != nil {
+		return nil, err
+	}
+
+	talent.Id, err = uuid.Parse(doc.Ref.ID)
 	if err != nil {
 		return nil, err
 	}

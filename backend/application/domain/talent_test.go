@@ -122,38 +122,6 @@ func TestValidateSuccess(t *testing.T) {
 	}
 }
 
-func TestBuildTalent(t *testing.T) {
-	id := uuid.New()
-	capturedAt := time.Now().UTC()
-	tags := []string{"Go", "Docker"}
-
-	talent := BuildTalent(id, "https://linkedin.com/in/jane", "Lead Engineer", "Jane Smith", "Tech Lead", "StartUp Inc", "CTO", tags, "Excellent", capturedAt)
-
-	if talent.Id != id {
-		t.Errorf("expected Id %v, got %v", id, talent.Id)
-	}
-
-	if talent.ProfileURL != "https://linkedin.com/in/jane" {
-		t.Errorf("expected ProfileURL 'https://linkedin.com/in/jane', got %s", talent.ProfileURL)
-	}
-
-	if talent.FullName != "Jane Smith" {
-		t.Errorf("expected FullName 'Jane Smith', got %s", talent.FullName)
-	}
-
-	if talent.CurrentRole != "CTO" {
-		t.Errorf("expected CurrentRole 'CTO', got %s", talent.CurrentRole)
-	}
-
-	if talent.CapturedAt != capturedAt {
-		t.Errorf("expected CapturedAt %v, got %v", capturedAt, talent.CapturedAt)
-	}
-
-	if len(talent.Tags) != 2 || talent.Tags[0] != "Go" || talent.Tags[1] != "Docker" {
-		t.Errorf("expected tags ['Go', 'Docker'], got %v", talent.Tags)
-	}
-}
-
 func TestCapturedAtTimestamp(t *testing.T) {
 	beforeCreate := time.Now().UTC()
 	talent, _ := Create("https://test.com", "Dev", "Test", "Headline", "Company", "Role", []string{}, "Notes")

@@ -16,6 +16,7 @@ func Serve(talentGateway domain.TalentGateway) {
 
 	handler := NewHandler(talentGateway)
 	http.HandleFunc("POST /talent", handler.CreateTalent)
+	http.HandleFunc("GET /talent/{id}", handler.GetTalent)
 
 	log.Println("starting server on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
