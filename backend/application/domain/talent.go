@@ -8,16 +8,16 @@ import (
 )
 
 type Talent struct {
-	Id             uuid.UUID
-	ProfileURL     string
-	PossibleRole   string
-	FullName       string
-	Headline       string
-	CurrentCompany string
-	CurrentRole    string
-	Tags           []string
-	Notes          string
-	CapturedAt     time.Time
+	Id             uuid.UUID `firestore:"-"`
+	ProfileURL     string    `firestore:"profile_url"`
+	PossibleRole   string    `firestore:"possible_role"`
+	FullName       string    `firestore:"full_name"`
+	Headline       string    `firestore:"headline"`
+	CurrentCompany string    `firestore:"current_company"`
+	CurrentRole    string    `firestore:"current_role"`
+	Tags           []string  `firestore:"tags"`
+	Notes          string    `firestore:"notes"`
+	CapturedAt     time.Time `firestore:"captured_at"`
 }
 
 func Create(profileUrl string, possibleRole string, fullName string, headline string, currentCompany string,

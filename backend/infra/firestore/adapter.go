@@ -5,6 +5,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/allanCordeiro/talent-db/application/domain"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type TalentDB struct {
@@ -21,7 +23,7 @@ func NewTalentDB(client *firestore.Client, projectID string) *TalentDB {
 
 func (db *TalentDB) Save(ctx context.Context, talent domain.Talent) error {
 	t, err := db.GetTalentById(ctx, talent.Id.String())
-	if err != nil {
+	if err != nil && status.Code(err) != codes.NotFound {
 		return err
 	}
 	if t != nil {

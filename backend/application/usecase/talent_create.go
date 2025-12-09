@@ -19,14 +19,14 @@ func NewCreateTalentUseCase(ctx context.Context, talentGateway domain.TalentGate
 }
 
 type CreateTalentInputDTO struct {
-	ProfileURL     string
-	PossibleRole   string
-	FullName       string
-	Headline       string
-	CurrentCompany string
-	CurrentRole    string
-	Tags           []string
-	Notes          string
+	ProfileURL     string   `json:"profile_url"`
+	PossibleRole   string   `json:"possible_role"`
+	FullName       string   `json:"full_name"`
+	Headline       string   `json:"headline"`
+	CurrentCompany string   `json:"current_company"`
+	CurrentRole    string   `json:"current_role"`
+	Tags           []string `json:"tags"`
+	Notes          string   `json:"notes"`
 }
 
 type CreateTalentOutputDTO struct {
