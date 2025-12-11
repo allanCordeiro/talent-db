@@ -1,0 +1,166 @@
+basePath: /
+definitions:
+  usecase.CreateTalentInputDTO:
+    properties:
+      current_company:
+        type: string
+      current_role:
+        type: string
+      full_name:
+        type: string
+      headline:
+        type: string
+      notes:
+        type: string
+      possible_role:
+        type: string
+      profile_url:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  usecase.GetTalentOutputDTO:
+    properties:
+      captured_at:
+        type: string
+      current_company:
+        type: string
+      current_role:
+        type: string
+      full_name:
+        type: string
+      headline:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      possible_role:
+        type: string
+      profile_url:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  webserver.CreateTalentResponse:
+    properties:
+      value:
+        type: string
+    type: object
+info:
+  contact:
+    email: allan.cordeiro.santos@gmail.com
+    name: Allan Cordeiro
+  description: API pessoal para biblioteca de talentos.
+  title: Talent API
+  version: "1.0"
+paths:
+  /talent:
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um talento com os dados enviados no corpo da requisição.
+      parameters:
+      - description: Dados do talento
+        in: body
+        name: talent
+        required: true
+        schema:
+          $ref: '#/definitions/usecase.CreateTalentInputDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Recurso criado
+          headers:
+            Location:
+              description: URL do talento recém-criado
+              type: string
+          schema:
+            $ref: '#/definitions/webserver.CreateTalentResponse'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "500":
+          description: internal error
+          schema:
+            type: string
+      summary: Cria um talento
+      tags:
+      - talents
+  /talent/{id}:
+    get:
+      description: Retorna os dados completos de um talento específico.
+      parameters:
+      - description: ID do talento
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usecase.GetTalentOutputDTO'
+        "404":
+          description: talent not found
+          schema:
+            type: string
+        "500":
+          description: internal error
+          schema:
+            type: string
+      summary: Busca um talento
+      tags:
+      - talents
+  /talents:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista de talentos com paginação e filtros em memória.
+      parameters:
+      - description: Limite de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Cursor para próxima página
+        in: query
+        name: cursor
+        type: string
+      - description: Filtro por nome (substring, case-insensitive)
+        in: query
+        name: name
+        type: string
+      - description: Filtro por possible role (substring, case-insensitive)
+        in: query
+        name: possible_role
+        type: string
+      - collectionFormat: csv
+        description: 'Tags (AND) - múltiplos valores ex: ?tags=go&tags=backend'
+        in: query
+        items:
+          type: string
+        name: tags
+        type: array
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: unauthorized
+          schema:
+            type: string
+        "500":
+          description: internal error
+          schema:
+            type: string
+      summary: Lista talentos
+      tags:
+      - talents
+swagger: "2.0"

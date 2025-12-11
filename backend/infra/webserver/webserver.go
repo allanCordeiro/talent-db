@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/allanCordeiro/talent-db/application/domain"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func Serve(talentGateway domain.TalentGateway) {
@@ -18,6 +19,7 @@ func Serve(talentGateway domain.TalentGateway) {
 	http.HandleFunc("POST /talent", handler.CreateTalent)
 	http.HandleFunc("GET /talent/{id}", handler.GetTalent)
 	http.HandleFunc("GET /talents", handler.ListTalents)
+	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
 	log.Println("starting server on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -1,0 +1,253 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API pessoal para biblioteca de talentos.",
+        "title": "Talent API",
+        "contact": {
+            "name": "Allan Cordeiro",
+            "email": "allan.cordeiro.santos@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/talent": {
+            "post": {
+                "description": "Cadastra um talento com os dados enviados no corpo da requisição.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "talents"
+                ],
+                "summary": "Cria um talento",
+                "parameters": [
+                    {
+                        "description": "Dados do talento",
+                        "name": "talent",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CreateTalentInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Recurso criado",
+                        "schema": {
+                            "$ref": "#/definitions/webserver.CreateTalentResponse"
+                        },
+                        "headers": {
+                            "Location": {
+                                "type": "string",
+                                "description": "URL do talento recém-criado"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/talent/{id}": {
+            "get": {
+                "description": "Retorna os dados completos de um talento específico.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "talents"
+                ],
+                "summary": "Busca um talento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do talento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/usecase.GetTalentOutputDTO"
+                        }
+                    },
+                    "404": {
+                        "description": "talent not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/talents": {
+            "get": {
+                "description": "Retorna uma lista de talentos com paginação e filtros em memória.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "talents"
+                ],
+                "summary": "Lista talentos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limite de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor para próxima página",
+                        "name": "cursor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtro por nome (substring, case-insensitive)",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtro por possible role (substring, case-insensitive)",
+                        "name": "possible_role",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Tags (AND) - múltiplos valores ex: ?tags=go\u0026tags=backend",
+                        "name": "tags",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "usecase.CreateTalentInputDTO": {
+            "type": "object",
+            "properties": {
+                "current_company": {
+                    "type": "string"
+                },
+                "current_role": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "headline": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "possible_role": {
+                    "type": "string"
+                },
+                "profile_url": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "usecase.GetTalentOutputDTO": {
+            "type": "object",
+            "properties": {
+                "captured_at": {
+                    "type": "string"
+                },
+                "current_company": {
+                    "type": "string"
+                },
+                "current_role": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "headline": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "possible_role": {
+                    "type": "string"
+                },
+                "profile_url": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "webserver.CreateTalentResponse": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
