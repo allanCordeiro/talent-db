@@ -21,12 +21,12 @@ func (g *InMemoryTalentGateway) Save(ctx context.Context, talent domain.Talent) 
 	g.talents[talent.Id.String()] = talent
 	return nil
 }
-func (g *InMemoryTalentGateway) GetTalents(ctx context.Context) ([]domain.Talent, error) {
+func (g *InMemoryTalentGateway) GetTalents(ctx context.Context, limit int, cursor string) ([]domain.Talent, string, error) {
 	var talents []domain.Talent
 	for _, t := range g.talents {
 		talents = append(talents, t)
 	}
-	return talents, nil
+	return talents, "", nil
 }
 func (g *InMemoryTalentGateway) GetTalentById(ctx context.Context, id string) (*domain.Talent, error) {
 	if talent, exists := g.talents[id]; exists {

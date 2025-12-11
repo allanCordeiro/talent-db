@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/allanCordeiro/talent-db/application/domain"
 	"github.com/allanCordeiro/talent-db/application/usecase"
@@ -79,4 +80,41 @@ func (h *Handler) GetTalent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(output)
 
+}
+
+func (h *Handler) ListTalents(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	limitParam := r.URL.Query().Get("limit")
+	cursorParam := r.URL.Query().Get("cursor")
+	nameParam := r.URL.Query().Get("name")
+	possibleRoleParam := r.URL.Query().Get("possible_role")
+	tagsParam := r.URL.Query()["tags"]
+
+	uc := usecase.NewListTalentUseCase(r.Context(), h.TalentGateway)
+	output, err := uc.Execute(usecase.ListTalentsInputDTO{
+		Limit:        parseToInt(limitParam, 50),
+		Cursor:       cursorParam,
+		Name:         nameParam,
+		PossibleRole: possibleRoleParam,
+		Tags:         tagsParam,
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("application error: " + err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(output)
+}
+
+func parseToInt(value string, defaultValue int) int {
+	if value == "" {
+		return defaultValue
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil {
+		return defaultValue
+	}
+	return parsed
 }

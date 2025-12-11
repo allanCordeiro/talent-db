@@ -2,11 +2,14 @@ package firestore
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/allanCordeiro/talent-db/application/domain"
 	"github.com/google/uuid"
+	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -41,22 +44,57 @@ func (db *TalentDB) Save(ctx context.Context, talent domain.Talent) error {
 	return nil
 }
 
-func (db *TalentDB) GetTalents(ctx context.Context) ([]domain.Talent, error) {
+func (db *TalentDB) GetTalents(ctx context.Context, limit int, cursor string) ([]domain.Talent, string, error) {
 	var talents []domain.Talent
-	iter := db.fsClient.Collection("talents").Documents(ctx)
+	var lastCapturedAt time.Time
+	q := db.fsClient.Collection("talents").OrderBy("captured_at", firestore.Desc)
+
+	if cursor != "" {
+		var cursorData time.Time
+		if decoded, err := base64.StdEncoding.DecodeString(cursor); err == nil {
+			if err := cursorData.UnmarshalText(decoded); err == nil {
+				q = q.StartAfter(cursorData)
+			}
+		}
+	}
+
+	q.Limit(limit)
+	iter := q.Documents(ctx)
+	defer iter.Stop()
+
 	for {
-		doc, err := iter.Next()
-		if err != nil {
+		if len(talents) >= limit {
 			break
 		}
+
+		doc, err := iter.Next()
+
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+			return nil, "", err
+		}
+
 		var talent domain.Talent
 		err = doc.DataTo(&talent)
 		if err != nil {
-			return nil, err
+			continue
 		}
 		talents = append(talents, talent)
+		lastCapturedAt = talent.CapturedAt
 	}
-	return talents, nil
+
+	var nextCursor string
+	if !lastCapturedAt.IsZero() && len(talents) == limit {
+		encoded, err := lastCapturedAt.MarshalText()
+		if err != nil {
+			return nil, "", err
+		}
+		nextCursor = base64.StdEncoding.EncodeToString(encoded)
+	}
+
+	return talents, nextCursor, nil
 }
 
 func (db *TalentDB) GetTalentById(ctx context.Context, id string) (*domain.Talent, error) {
