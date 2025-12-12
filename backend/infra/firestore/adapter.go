@@ -81,6 +81,7 @@ func (db *TalentDB) GetTalents(ctx context.Context, limit int, cursor string) ([
 		if err != nil {
 			continue
 		}
+		talent.Id, _ = uuid.Parse(doc.Ref.ID)
 		talents = append(talents, talent)
 		lastCapturedAt = talent.CapturedAt
 	}
