@@ -28,7 +28,7 @@ func NewTalentDB(client *firestore.Client, projectID string) *TalentDB {
 
 func (db *TalentDB) Save(ctx context.Context, talent domain.Talent) error {
 	t, err := db.GetTalentById(ctx, talent.Id.String())
-	if err != nil && status.Code(err) != codes.NotFound {
+	if err != nil && err.Error() != "talent not found" {
 		return err
 	}
 	if t != nil {
