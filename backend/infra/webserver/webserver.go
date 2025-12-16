@@ -15,10 +15,15 @@ func Serve(talentGateway domain.TalentGateway) {
 		port = "8080"
 	}
 
-	handler := NewHandler(talentGateway)
-	http.HandleFunc("POST /talent", handler.CreateTalent)
-	http.HandleFunc("GET /talent/{id}", handler.GetTalent)
-	http.HandleFunc("GET /talents", handler.ListTalents)
+	token := os.Getenv("API_TOKEN")
+	if token == "" {
+		log.Panicf("API_TOKEN environment variable not set")
+	}
+
+	handler := NewHandler(talentGateway, token)
+	http.HandleFunc("POST /talent", handler.withAuth(handler.CreateTalent))
+	http.HandleFunc("GET /talent/{id}", handler.withAuth(handler.GetTalent))
+	http.HandleFunc("GET /talents", handler.withAuth(handler.ListTalents))
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
 	log.Println("starting server on port " + port)

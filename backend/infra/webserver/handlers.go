@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -13,11 +14,13 @@ import (
 
 type Handler struct {
 	TalentGateway domain.TalentGateway
+	token         string
 }
 
-func NewHandler(talentGateway domain.TalentGateway) *Handler {
+func NewHandler(talentGateway domain.TalentGateway, token string) *Handler {
 	return &Handler{
 		TalentGateway: talentGateway,
+		token:         token,
 	}
 }
 
@@ -145,6 +148,19 @@ func (h *Handler) ListTalents(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(output)
 }
 
+func (h *Handler) withAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authToken := h.token
+		if authToken == "" {
+			log.Panicf("API_TOKEN environment variable not set")
+		}
+		if !checkAuth(w, r, authToken) {
+			return
+		}
+		next(w, r)
+	}
+}
+
 func parseToInt(value string, defaultValue int) int {
 	if value == "" {
 		return defaultValue
@@ -154,4 +170,16 @@ func parseToInt(value string, defaultValue int) int {
 		return defaultValue
 	}
 	return parsed
+}
+
+func checkAuth(w http.ResponseWriter, r *http.Request, authToken string) bool {
+
+	providedToken := r.Header.Get("Authorization")
+	expected := "Bearer " + authToken
+	if subtle.ConstantTimeCompare([]byte(providedToken), []byte(expected)) != 1 {
+		w.WriteHeader(http.StatusUnauthorized)
+		return false
+	}
+	return true
+
 }
